@@ -1,18 +1,17 @@
-import { LiveScan } from '@/components/live-scan';
+import { EquipmentCatalog } from '@/components/equipment-catalog';
 
-export default function Home() {
+export default function CatalogPage() {
   return (
     <div className="flex flex-col items-center gap-8">
       <div className="text-center max-w-3xl mx-auto">
         <h1 className="text-4xl sm:text-5xl font-bold font-headline tracking-tight text-primary">
-          Live Equipment Scan
+          Equipment Catalog
         </h1>
         <p className="mt-4 text-lg text-foreground/80">
-          Point your camera at a piece of lab equipment, and we'll identify it for you.
-          Make sure the item is well-lit and centered in the frame for the best results.
+          Browse our catalog of common science lab equipment to learn more about each item.
         </p>
       </div>
-      <LiveScan />
+      <EquipmentCatalog />
     </div>
   );
 }
