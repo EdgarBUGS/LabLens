@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Beaker, FlaskConical, TestTube2, Pipette, Scale, Microscope, Thermometer, BunsenBurner } from 'lucide-react';
+import { Beaker, FlaskConical, TestTube2, Pipette, Scale, Microscope, Thermometer, Flame } from 'lucide-react';
 
 const equipmentList = [
   { name: 'Beaker', icon: Beaker, description: 'A cylindrical container used for stirring, mixing and heating liquids.' },
@@ -10,7 +10,7 @@ const equipmentList = [
   { name: 'Digital Scale', icon: Scale, description: 'An instrument used to measure mass with high precision.' },
   { name: 'Microscope', icon: Microscope, description: 'An instrument used to see objects that are too small for the naked eye.' },
   { name: 'Thermometer', icon: Thermometer, description: 'A device that measures temperature or a temperature gradient.' },
-  { name: 'Bunsen Burner', icon: BunsenBurner, description: 'Produces a single open gas flame, which is used for heating.' },
+  { name: 'Bunsen Burner', icon: Flame, description: 'Produces a single open gas flame, which is used for heating.' },
 ];
 
 export function EquipmentCatalog() {
