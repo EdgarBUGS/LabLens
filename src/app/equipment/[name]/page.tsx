@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, use } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +17,7 @@ export default function EquipmentDetailsPage({
   params: Promise<{ name: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const router = useRouter();
   const resolvedParams = use(params);
   const resolvedSearchParams = use(searchParams);
   const equipmentName = decodeURIComponent(resolvedParams.name);
@@ -40,6 +42,33 @@ export default function EquipmentDetailsPage({
       setSpeechSynthesis(window.speechSynthesis);
     }
   }, []);
+
+  // Voice command: Listen for 'another equipment' and navigate to scan page
+  useEffect(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+    
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+    
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+      if (transcript.includes('another equipment')) {
+        router.push('/');
+      } else if (transcript.includes('okay')) {
+        stopSpeaking();
+      }
+    };
+    
+    recognition.onerror = (event: any) => {
+      // Optionally handle errors
+    };
+    
+    recognition.start();
+    return () => recognition.stop();
+  }, [router]);
 
   // Auto-play audio when page loads from equipment identification
   useEffect(() => {
@@ -176,7 +205,12 @@ export default function EquipmentDetailsPage({
         </CardContent>
       </Card>
       
-      <EquipmentQnA equipmentName={equipmentName} />
+      <EquipmentQnA 
+        equipmentName={equipmentName}
+        description={description}
+        category={category}
+        capturedImage={capturedImage}
+      />
     </div>
   );
 }

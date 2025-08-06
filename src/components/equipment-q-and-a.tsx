@@ -25,9 +25,12 @@ const formSchema = z.object({
 
 type EquipmentQnAProps = {
   equipmentName: string;
+  description?: string | null;
+  category?: string | null;
+  capturedImage?: string | null;
 };
 
-export function EquipmentQnA({ equipmentName }: EquipmentQnAProps) {
+export function EquipmentQnA({ equipmentName, description, category, capturedImage }: EquipmentQnAProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [explanation, setExplanation] = useState<string | null>(null);
@@ -147,9 +150,16 @@ export function EquipmentQnA({ equipmentName }: EquipmentQnAProps) {
     setExplanation(null);
     setIsPlaying(false);
     try {
+      // Build context string for the AI
+      let context = `Equipment: ${equipmentName}.`;
+      if (category) context += ` Category: ${category}.`;
+      if (description) context += ` Description: ${description}`;
+      if (capturedImage) context += ` (A captured image is available.)`;
+      // Prepend context to the user query
+      const fullPrompt = `${context}\n\nUser Question: ${values.query}`;
       const result = await getEquipmentDetails({
         equipmentName: equipmentName,
-        query: values.query,
+        query: fullPrompt,
       });
       setExplanation(result.explanation);
     } catch (error) {

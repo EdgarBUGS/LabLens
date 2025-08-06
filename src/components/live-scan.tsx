@@ -58,6 +58,28 @@ export function LiveScan() {
     };
   }, [setupCamera]);
 
+  // Voice command: Listen for 'Identify Equipment' and trigger scan
+  useEffect(() => {
+    if (!isCameraReady || capturedImage) return;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+      if (transcript.includes('identify equipment')) {
+        handleScan();
+      }
+    };
+    recognition.onerror = (event: any) => {
+      // Optionally handle errors
+    };
+    recognition.start();
+    return () => recognition.stop();
+  }, [isCameraReady, capturedImage]);
+
   // Effect to handle navigation after identification
   useEffect(() => {
     if (shouldNavigate && identificationResult && capturedImage && !isNavigating) {
