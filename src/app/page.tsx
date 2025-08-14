@@ -9,6 +9,7 @@ export default function Home() {
         </h1>
         <p className="mt-4 text-lg text-foreground/80">
           Point your camera at a piece of lab equipment, and we'll identify it for you.
+          This app is designed to detect only laboratory equipment - non-laboratory items will be rejected.
           Make sure the item is well-lit and centered in the frame for the best results.
         </p>
       </div>

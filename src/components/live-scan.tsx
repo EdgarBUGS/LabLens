@@ -112,14 +112,26 @@ export function LiveScan() {
         const result: IdentifyEquipmentOutput = await identifyEquipment({ photoDataUri: capturedImageDataUri });
 
         if (result && result.equipmentName) {
-          setIdentificationResult(result);
-          toast({
-            title: "Equipment Identified!",
-            description: `Identified as: ${result.equipmentName}`,
-          });
-          
-          // Set flag to trigger navigation in useEffect
-          setShouldNavigate(true);
+          // Check if the identified item is actually laboratory equipment
+          if (result.isLaboratoryEquipment) {
+            setIdentificationResult(result);
+            toast({
+              title: "Equipment Identified!",
+              description: `Identified as: ${result.equipmentName}`,
+            });
+            
+            // Set flag to trigger navigation in useEffect
+            setShouldNavigate(true);
+          } else {
+            // Item is not laboratory equipment
+            setIdentificationResult(result);
+            toast({
+              variant: "destructive",
+              title: "Not Laboratory Equipment",
+              description: result.rejectionReason || "This item is not laboratory equipment.",
+            });
+            setError("The scanned item is not laboratory equipment. Please scan a piece of lab equipment instead.");
+          }
         } else {
           throw new Error("Identification failed. No equipment name found in result.");
         }
@@ -224,7 +236,11 @@ export function LiveScan() {
             {identificationResult && (
               <div className="absolute bottom-0 left-0 p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle className="h-5 w-5 text-green-400" />
+                  {identificationResult.isLaboratoryEquipment ? (
+                    <CheckCircle className="h-5 w-5 text-green-400" />
+                  ) : (
+                    <AlertCircle className="h-5 w-5 text-red-400" />
+                  )}
                   <h3 className="text-xl font-bold text-white">{identificationResult.equipmentName}</h3>
                 </div>
                 {identificationResult.category && (
@@ -232,8 +248,18 @@ export function LiveScan() {
                     {identificationResult.category}
                   </Badge>
                 )}
+                {!identificationResult.isLaboratoryEquipment && identificationResult.rejectionReason && (
+                  <div className="mt-2 text-red-200 text-sm">
+                    <p className="font-semibold">Rejection Reason:</p>
+                    <p>{identificationResult.rejectionReason}</p>
+                  </div>
+                )}
                 <div className="mt-2 text-white/80 text-sm">
-                  <p>{isNavigating ? "Navigating to details page..." : "Redirecting to details page..."}</p>
+                  {identificationResult.isLaboratoryEquipment ? (
+                    <p>{isNavigating ? "Navigating to details page..." : "Redirecting to details page..."}</p>
+                  ) : (
+                    <p>Please scan a piece of laboratory equipment instead.</p>
+                  )}
                 </div>
               </div>
             )}
@@ -271,10 +297,17 @@ export function LiveScan() {
                 New Scan
               </Button>
               {identificationResult && !isNavigating && (
-                <Button onClick={handleViewDetails} size="lg">
-                  <ArrowRight className="mr-2 h-5 w-5" />
-                  View Details
-                </Button>
+                identificationResult.isLaboratoryEquipment ? (
+                  <Button onClick={handleViewDetails} size="lg">
+                    <ArrowRight className="mr-2 h-5 w-5" />
+                    View Details
+                  </Button>
+                ) : (
+                  <Button disabled size="lg" variant="outline">
+                    <AlertCircle className="mr-2 h-5 w-5" />
+                    Not Lab Equipment
+                  </Button>
+                )
               )}
             </>
           )}
